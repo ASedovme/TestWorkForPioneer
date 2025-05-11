@@ -2,7 +2,6 @@ package me.sedov.TestWorkForPioneer.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.sedov.TestWorkForPioneer.exception.EntityNotFoundException;
-import me.sedov.TestWorkForPioneer.exception.UserNotFoundException;
 import me.sedov.TestWorkForPioneer.model.Account;
 import me.sedov.TestWorkForPioneer.model.EmailData;
 import me.sedov.TestWorkForPioneer.model.PhoneData;
@@ -14,9 +13,13 @@ import me.sedov.TestWorkForPioneer.repository.UserRepository;
 import me.sedov.TestWorkForPioneer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,44 +65,68 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public List<User> searchUsers(String name) {
-        return userRepository.findByNameContainingIgnoreCase(name);
-    }
+
 
     @Override
     public void updateEmail(Long userId, String newEmail) {
-        User user = userRepository.findById(userId)
+        User user = (User) userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с ID: " + userId));
 
-        // Проверяем, существует ли уже запись email для данного пользователя
+        // Проверка на уникальность нового email
+        if (emailDataRepository.existsByEmail(newEmail)) {
+            throw new RuntimeException("Email уже используется");
+        }
+
         EmailData emailData = (EmailData) emailDataRepository.findByUser(user)
                 .orElseThrow(() -> new EntityNotFoundException("Email не найден для пользователя с ID: " + userId));
 
-        // Обновляем email
+        // Обновление email
         emailData.setEmail(newEmail);
         emailDataRepository.save(emailData);
-
-
     }
 
     @Override
     public void updatePhone(Long userId, String newPhone) {
-        User user = userRepository.findById(userId)
+        User user = (User) userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с ID: " + userId));
 
-        // Проверяем, существует ли уже запись телефона для данного пользователя
+        // Проверка на уникальность нового номера телефона
+        if (phoneDataRepository.existsByPhone(newPhone)) {
+            throw new RuntimeException("Номер телефона уже используется");
+        }
+
         PhoneData phoneData = phoneDataRepository.findByUser(user)
                 .orElseThrow(() -> new EntityNotFoundException("Телефон не найден для пользователя с ID: " + userId));
 
-        // Обновляем телефон
+        // Обновление номера телефона
         phoneData.setPhone(newPhone);
         phoneDataRepository.save(phoneData);
     }
 
+    @Override
+    public void incrementBalances() {
+        List<Account> accounts = accountRepository.findAll();
+
+        for (Account account : accounts) {
+            BigDecimal currentBalance = account.getBalance();
+            BigDecimal initialDeposit = account.getInitialDeposit(); // Получаем текущее значение баланса
+
+            BigDecimal maxAllowedBalance = initialDeposit.multiply(BigDecimal.valueOf(2.07));
+            if (currentBalance.compareTo(maxAllowedBalance) < 0) {
+                BigDecimal incrementAmount = currentBalance.multiply(BigDecimal.valueOf(0.10));
+                account.setBalance(currentBalance.add(incrementAmount));
+                accountRepository.save(account);
+            }
+        }
+    }
+    public Page<User> findAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable);
+    }
 
     @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public List<User> searchUser(String name, String email, String phone, LocalDateTime dateOfBirth) {
+        return userRepository.searchUser(name, email, phone, dateOfBirth);
     }
+
 }

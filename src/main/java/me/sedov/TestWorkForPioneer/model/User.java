@@ -1,6 +1,7 @@
 package me.sedov.TestWorkForPioneer.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -22,12 +23,15 @@ public class User {
 
         private String password;
 
+        @JsonManagedReference
         @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
         private Account account;
 
+        @JsonManagedReference
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
         private List<EmailData> emailDataList;
 
+        @JsonManagedReference
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
         private List<PhoneData> phoneDataList;
 }

@@ -1,5 +1,6 @@
 package me.sedov.TestWorkForPioneer.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ public class EmailData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

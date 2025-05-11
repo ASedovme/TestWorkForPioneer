@@ -1,5 +1,6 @@
 package me.sedov.TestWorkForPioneer.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -14,9 +15,14 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     private BigDecimal balance;
+
+    public BigDecimal getInitialDeposit() {
+        return balance;
+    }
 }

@@ -3,13 +3,18 @@ package me.sedov.TestWorkForPioneer.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.sedov.TestWorkForPioneer.dto.TransferRequest;
+import me.sedov.TestWorkForPioneer.dto.UserDTO;
 import me.sedov.TestWorkForPioneer.model.User;
 import me.sedov.TestWorkForPioneer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,9 +36,30 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam String name) {
-        List<User> users = userService.searchUsers(name);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> searchUser(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) LocalDateTime dateOfBirth) {
+
+        try {
+            List<User> users = userService.searchUser(name, email, phone, dateOfBirth);
+
+            if (!users.isEmpty()) {
+                List<UserDTO> userDTOs = users.stream()
+                        .map(user -> new UserDTO(user.getId(), user.getName(), user.getDateOfBirth(),
+                                user.getAccount(), user.getEmailDataList(),
+                                user.getPhoneDataList()))
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(userDTOs);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            // Логирование ошибки
+            e.printStackTrace(); // Или используйте логгер
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PutMapping("/{userId}/email")
@@ -48,9 +74,4 @@ public class UserController {
         return ResponseEntity.ok("Телефон обновлен успешно");
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.addUser(user);
-        return ResponseEntity.ok(createdUser); // Возвращаем созданного пользователя с HTTP статусом 200 OK
-    }
 }
