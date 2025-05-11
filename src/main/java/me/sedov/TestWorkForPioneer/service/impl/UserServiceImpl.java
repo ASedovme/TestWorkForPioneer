@@ -1,8 +1,15 @@
 package me.sedov.TestWorkForPioneer.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import me.sedov.TestWorkForPioneer.exception.EntityNotFoundException;
+import me.sedov.TestWorkForPioneer.exception.UserNotFoundException;
 import me.sedov.TestWorkForPioneer.model.Account;
+import me.sedov.TestWorkForPioneer.model.EmailData;
+import me.sedov.TestWorkForPioneer.model.PhoneData;
 import me.sedov.TestWorkForPioneer.model.User;
 import me.sedov.TestWorkForPioneer.repository.AccountRepository;
+import me.sedov.TestWorkForPioneer.repository.EmailDataRepository;
+import me.sedov.TestWorkForPioneer.repository.PhoneDataRepository;
 import me.sedov.TestWorkForPioneer.repository.UserRepository;
 import me.sedov.TestWorkForPioneer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -21,6 +29,13 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private final EmailDataRepository emailDataRepository;
+
+    @Autowired
+    private final PhoneDataRepository phoneDataRepository;
+
 
     @Override
     @Cacheable(value = "users", key = "#id")
@@ -49,16 +64,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> searchUsers(String name) {
-        return userRepository.findAll();
+        return userRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Override
     public void updateEmail(Long userId, String newEmail) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с ID: " + userId));
+
+        // Проверяем, существует ли уже запись email для данного пользователя
+        EmailData emailData = (EmailData) emailDataRepository.findByUser(user)
+                .orElseThrow(() -> new EntityNotFoundException("Email не найден для пользователя с ID: " + userId));
+
+        // Обновляем email
+        emailData.setEmail(newEmail);
+        emailDataRepository.save(emailData);
+
 
     }
 
     @Override
     public void updatePhone(Long userId, String newPhone) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с ID: " + userId));
 
+        // Проверяем, существует ли уже запись телефона для данного пользователя
+        PhoneData phoneData = phoneDataRepository.findByUser(user)
+                .orElseThrow(() -> new EntityNotFoundException("Телефон не найден для пользователя с ID: " + userId));
+
+        // Обновляем телефон
+        phoneData.setPhone(newPhone);
+        phoneDataRepository.save(phoneData);
+    }
+
+
+    @Override
+    public User addUser(User user) {
+        return userRepository.save(user);
     }
 }

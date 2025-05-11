@@ -17,4 +17,6 @@ public interface UserService {
     public void updateEmail(Long userId, String newEmail);
 
     public void updatePhone(Long userId, String newPhone);
+
+    User addUser(User user);
 }
