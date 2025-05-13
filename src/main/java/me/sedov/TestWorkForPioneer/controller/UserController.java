@@ -45,12 +45,10 @@ public class UserController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate dateOfBirth) {
 
         try {
-            // Проверка, что все параметры не заданы
             if ((name == null || name.isEmpty()) &&
                     (email == null || email.isEmpty()) &&
                     (phone == null || phone.isEmpty()) &&
                     dateOfBirth == null) {
-                // Возвращаем сообщение о необходимости задать параметры
                 return ResponseEntity.badRequest().body("Задайте параметры поиска");
             }
 
@@ -65,7 +63,6 @@ public class UserController {
             } else if (dateOfBirth != null) {
                 users = userService.searchByDateOfBirth(dateOfBirth);
             } else {
-                // Можно оставить как есть или вернуть всех
                 users = userService.getAllUsers();
             }
 

@@ -17,7 +17,6 @@ public interface PhoneDataRepository extends JpaRepository<PhoneData, Long> {
 
     boolean existsByPhone(String newPhone);
 
-    List<User> findByPhoneContainingIgnoreCase(String phone);
 
     @Query("SELECT p.user.id FROM PhoneData p WHERE p.phone = :phone")
     Long findUserIdByPhone(@Param("phone") String phone);

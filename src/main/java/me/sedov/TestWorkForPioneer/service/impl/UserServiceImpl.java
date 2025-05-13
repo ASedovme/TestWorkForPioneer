@@ -49,8 +49,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void transferMoney(Long fromUserId, Long toUserId, BigDecimal amount) {
-        // Логика перевода денег с валидацией и обработкой ошибок.
-        // Пример:
         Account fromAccount = accountRepository.findById(fromUserId).orElseThrow();
         Account toAccount = accountRepository.findById(toUserId).orElseThrow();
 
@@ -73,7 +71,6 @@ public class UserServiceImpl implements UserService {
         User user = (User) userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с ID: " + userId));
 
-        // Проверка на уникальность нового email
         if (emailDataRepository.existsByEmail(newEmail)) {
             throw new RuntimeException("Email уже используется");
         }

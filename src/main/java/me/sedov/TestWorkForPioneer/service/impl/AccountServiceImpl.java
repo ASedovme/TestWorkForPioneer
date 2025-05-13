@@ -23,7 +23,7 @@ public class AccountServiceImpl implements AccountService {
 
         for (Account account : accounts) {
             BigDecimal currentBalance = account.getBalance();
-            BigDecimal initialDeposit = account.getInitialDeposit(); // Получаем текущее значение баланса
+            BigDecimal initialDeposit = account.getInitialDeposit();
 
             BigDecimal maxAllowedBalance = initialDeposit.multiply(BigDecimal.valueOf(2.07));
             if (currentBalance.compareTo(maxAllowedBalance) < 0) {

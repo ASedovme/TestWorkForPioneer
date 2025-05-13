@@ -20,6 +20,6 @@ public class EmailData {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Email // Валидация email-адреса
+    @Email
     private String email;
 }
