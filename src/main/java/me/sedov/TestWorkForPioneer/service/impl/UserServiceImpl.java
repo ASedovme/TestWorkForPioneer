@@ -19,7 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -136,11 +137,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> searchByPhone(String phone) {
-        return phoneDataRepository.findByPhoneContainingIgnoreCase(phone);
+        Long id = phoneDataRepository.findUserIdByPhone(phone);
+        if (id == null) {
+            return Collections.emptyList();
+        }
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.map(Collections::singletonList).orElseGet(Collections::emptyList);
     }
 
     @Override
-    public List<User> searchByDateOfBirth(LocalDateTime dateOfBirth) {
+    public List<User> searchByDateOfBirth(LocalDate dateOfBirth) {
         return userRepository.findByDateOfBirth(dateOfBirth);
     }
 

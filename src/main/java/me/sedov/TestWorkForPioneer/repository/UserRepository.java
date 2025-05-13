@@ -19,5 +19,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long userId);
 
-    List<User> findByDateOfBirth(LocalDateTime dateOfBirth);
+    List<User> findByDateOfBirth(LocalDate dateOfBirth);
 }

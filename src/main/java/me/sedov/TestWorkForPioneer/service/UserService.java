@@ -4,7 +4,7 @@ import me.sedov.TestWorkForPioneer.model.User;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public interface UserService {
 
     List<User> searchByPhone(String phone);
 
-    List<User> searchByDateOfBirth(LocalDateTime dateOfBirth);
+    List<User> searchByDateOfBirth(LocalDate dateOfBirth);
 
     List<User> getAllUsers();
 }
