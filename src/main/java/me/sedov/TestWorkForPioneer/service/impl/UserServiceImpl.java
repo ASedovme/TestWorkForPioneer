@@ -125,8 +125,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUser(String name, String email, String phone, LocalDateTime dateOfBirth) {
-        return userRepository.searchUser(name, email, phone, dateOfBirth);
+    public List<User> searchByName(String name) {
+        return userRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public List<User> searchByEmail(String email) {
+        return emailDataRepository.findByEmailContainingIgnoreCase(email);
+    }
+
+    @Override
+    public List<User> searchByPhone(String phone) {
+        return phoneDataRepository.findByPhoneContainingIgnoreCase(phone);
+    }
+
+    @Override
+    public List<User> searchByDateOfBirth(LocalDateTime dateOfBirth) {
+        return userRepository.findByDateOfBirth(dateOfBirth);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 }

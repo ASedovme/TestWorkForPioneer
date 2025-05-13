@@ -7,6 +7,7 @@ import me.sedov.TestWorkForPioneer.dto.UserDTO;
 import me.sedov.TestWorkForPioneer.model.User;
 import me.sedov.TestWorkForPioneer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +37,36 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserDTO>> searchUser(
+    public ResponseEntity<?> searchUser(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone,
-            @RequestParam(required = false) LocalDateTime dateOfBirth) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateOfBirth) {
 
         try {
-            List<User> users = userService.searchUser(name, email, phone, dateOfBirth);
+            // Проверка, что все параметры не заданы
+            if ((name == null || name.isEmpty()) &&
+                    (email == null || email.isEmpty()) &&
+                    (phone == null || phone.isEmpty()) &&
+                    dateOfBirth == null) {
+                // Возвращаем сообщение о необходимости задать параметры
+                return ResponseEntity.badRequest().body("Задайте параметры поиска");
+            }
+
+            List<User> users;
+
+            if (name != null && !name.isEmpty()) {
+                users = userService.searchByName(name);
+            } else if (email != null && !email.isEmpty()) {
+                users = userService.searchByEmail(email);
+            } else if (phone != null && !phone.isEmpty()) {
+                users = userService.searchByPhone(phone);
+            } else if (dateOfBirth != null) {
+                users = userService.searchByDateOfBirth(dateOfBirth);
+            } else {
+                // Можно оставить как есть или вернуть всех
+                users = userService.getAllUsers();
+            }
 
             if (!users.isEmpty()) {
                 List<UserDTO> userDTOs = users.stream()
@@ -53,12 +76,11 @@ public class UserController {
                         .collect(Collectors.toList());
                 return ResponseEntity.ok(userDTOs);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователи не найдены");
             }
         } catch (Exception e) {
-            // Логирование ошибки
             e.printStackTrace(); // Или используйте логгер
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка сервера");
         }
     }
 

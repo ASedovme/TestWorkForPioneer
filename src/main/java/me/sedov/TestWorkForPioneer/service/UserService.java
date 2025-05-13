@@ -23,5 +23,14 @@ public interface UserService {
 
     Page<User> findAllUsers(int page, int size);
 
-    public List<User> searchUser(String name, String email, String phone, LocalDateTime dateOfBirth);
+
+    List<User> searchByName(String name);
+
+    List<User> searchByEmail(String email);
+
+    List<User> searchByPhone(String phone);
+
+    List<User> searchByDateOfBirth(LocalDateTime dateOfBirth);
+
+    List<User> getAllUsers();
 }
