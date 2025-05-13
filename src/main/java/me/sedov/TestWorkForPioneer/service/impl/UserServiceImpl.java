@@ -132,7 +132,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> searchByEmail(String email) {
-        return emailDataRepository.findByEmailContainingIgnoreCase(email);
+        Long id = emailDataRepository.findUserIdByEmailIgnoreCase(email);
+        if (id == null) {
+            return Collections.emptyList();
+        }
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.map(Collections::singletonList).orElseGet(Collections::emptyList);
     }
 
     @Override
