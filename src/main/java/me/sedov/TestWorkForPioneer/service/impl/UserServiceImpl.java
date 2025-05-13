@@ -104,22 +104,6 @@ public class UserServiceImpl implements UserService {
         phoneDataRepository.save(phoneData);
     }
 
-    @Override
-    public void incrementBalances() {
-        List<Account> accounts = accountRepository.findAll();
-
-        for (Account account : accounts) {
-            BigDecimal currentBalance = account.getBalance();
-            BigDecimal initialDeposit = account.getInitialDeposit(); // Получаем текущее значение баланса
-
-            BigDecimal maxAllowedBalance = initialDeposit.multiply(BigDecimal.valueOf(2.07));
-            if (currentBalance.compareTo(maxAllowedBalance) < 0) {
-                BigDecimal incrementAmount = currentBalance.multiply(BigDecimal.valueOf(0.10));
-                account.setBalance(currentBalance.add(incrementAmount));
-                accountRepository.save(account);
-            }
-        }
-    }
     public Page<User> findAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable);

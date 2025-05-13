@@ -19,10 +19,6 @@ public interface UserService {
 
     public void updatePhone(Long userId, String newPhone);
 
-    void incrementBalances();
-
-    Page<User> findAllUsers(int page, int size);
-
 
     List<User> searchByName(String name);
 
