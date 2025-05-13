@@ -29,10 +29,10 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     @Autowired
     private final EmailDataRepository emailDataRepository;
