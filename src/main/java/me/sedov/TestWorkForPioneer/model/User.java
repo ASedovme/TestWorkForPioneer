@@ -21,6 +21,7 @@ public class User {
         @Column(name = "date_of_birth")
         private LocalDate dateOfBirth;
 
+        @Column(nullable = false)
         private String password;
 
         @JsonManagedReference

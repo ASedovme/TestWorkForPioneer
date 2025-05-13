@@ -21,5 +21,6 @@ public class EmailData {
     private User user;
 
     @Email
+    @Column(nullable = false, unique = true)
     private String email;
 }

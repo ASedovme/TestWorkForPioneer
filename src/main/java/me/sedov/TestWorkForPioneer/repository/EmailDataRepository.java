@@ -17,6 +17,8 @@ public interface EmailDataRepository extends JpaRepository<EmailData, Long> {
 
     boolean existsByEmail(String newEmail);
 
+    Optional<EmailData> findByEmail(String email);
+
 
     @Query("SELECT p.user.id FROM EmailData p WHERE LOWER(p.email) = LOWER(:email)")
     Long findUserIdByEmailIgnoreCase(@Param("email") String email);
